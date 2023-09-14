@@ -4,6 +4,7 @@ from sqlalchemy.orm import declarative_base, relationship
 import datetime
 
 Base = declarative_base()
+
 class Publisher(Base):
     __tablename__ = "publisher"
 
@@ -21,7 +22,9 @@ class Book(Base):#класс регистрирует созданные обь�
     id = sq.Column(sq.Integer, primary_key=True)
     title = sq.Column(sq.Text, nullable=False)
     id_publisher = sq.Column(sq.Integer, sq.ForeignKey("publisher.id"), nullable=False) #ссылка на внешний ключ
+
     publisher = relationship("Publisher", backref="book")  # связи таблиц
+
 
     def __str__(self):
         return f'Book {self.id} : ({self.title}, {self.id_publisher})'
@@ -43,6 +46,7 @@ class Stock(Base):
     count = sq.Column(sq.Integer, nullable=False)
     book = relationship("Book", backref="stock")
     shop = relationship("Shop", backref="stock")
+    sale = relationship("Sale", backref="stock")
 
     def __str__(self):
         return f'Stock {self.id} : ({self.count}, {self.id_book}, {self.id_shop})'
@@ -54,13 +58,14 @@ class Sale(Base):
     date_sale = sq.Column(sq.DateTime,nullable=False)
     count = sq.Column(sq.Integer)
     id_stock = sq.Column(sq.Integer, sq.ForeignKey("stock.id"), nullable=False)
-    stock = relationship("Stock", backref="sale")
+
+
 
     def __str__(self):
         return f'Sale {self.id} : ({self.price}, {self.date_sale}, {self.count}, {self.id_stock})'
 
 def create_tables(engine):
-    #Base.metadata.drop_all(engine)# метод drop_all удалит все таблицы в базе данных
+    Base.metadata.drop_all(engine)# метод drop_all удалит все таблицы в базе данных
     Base.metadata.create_all(engine)#метод create_all создаст все таблицы в базе данных
 
 
